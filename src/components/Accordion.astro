@@ -1,0 +1,66 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  title: string;
+  hint?: string;
+  open?: boolean;
+}
+const { title, hint, open = false } = Astro.props;
+---
+
+<details class="acc" open={open}>
+  <summary>
+    <span>
+      <strong>{title}</strong>
+      {hint && <small>{hint}</small>}
+    </span>
+    <Icon name="chevron" size={22} class="chev" />
+  </summary>
+  <div class="body">
+    <slot />
+  </div>
+</details>
+
+<style>
+  .acc {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+  .acc + :global(.acc) {
+    margin-top: 10px;
+  }
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 20px;
+    cursor: pointer;
+    list-style: none;
+    min-height: 56px;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary span {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  summary small {
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  summary :global(.chev) {
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+  }
+  .acc[open] :global(.chev) {
+    transform: rotate(180deg);
+  }
+  .body {
+    padding: 0 20px 20px;
+  }
+</style>

@@ -1,0 +1,224 @@
+---
+import { Picture, getImage } from 'astro:assets';
+import Icon from './Icon.astro';
+import { fotosDe } from '../lib/galeria';
+
+interface Props {
+  espaco: string;
+  nome: string;
+  categorias: { pasta: string; label: string }[];
+}
+const { espaco, nome, categorias } = Astro.props;
+
+const grupos = await Promise.all(
+  categorias.map(async (c) => {
+    const fotos = fotosDe(`${espaco}/${c.pasta}`, `${nome}: ${c.label}`);
+    const itens = await Promise.all(
+      fotos.map(async (f) => ({ ...f, full: (await getImage({ src: f.src, width: 1600, format: 'webp' })).src })),
+    );
+    return { ...c, itens };
+  }),
+);
+const id = `galeria-${espaco}`;
+---
+
+<div class="gallery" data-gallery>
+  <div class="chips tabs">
+    {grupos.map((g, i) => (
+      <a class:list={['chip', { active: i === 0 }]} href={`#${id}-${g.pasta}`} data-jump>
+        {g.label}
+      </a>
+    ))}
+  </div>
+
+  <div class="track" tabindex="0" aria-label={`Fotos do ${nome}`}>
+    {grupos.map((g) => (
+      <section class="group" id={`${id}-${g.pasta}`} aria-label={g.label}>
+        {g.itens.length > 0
+          ? g.itens.map((f, i) => (
+              <button type="button" class="tile" data-full={f.full} data-alt={f.alt} aria-label={`Ampliar ${f.alt}`}>
+                <Picture
+                  src={f.src}
+                  alt={f.alt}
+                  widths={[320, 640]}
+                  sizes="(min-width: 900px) 360px, 78vw"
+                  formats={['avif', 'webp']}
+                  fallbackFormat="webp"
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                />
+                <span class="tag">{g.label}</span>
+              </button>
+            ))
+          : [0, 1].map(() => (
+              <div class="tile placeholder" aria-hidden="true">
+                <Icon name="photo" size={28} />
+                <span>{g.label}</span>
+              </div>
+            ))}
+      </section>
+    ))}
+  </div>
+
+  <dialog class="lightbox" aria-label="Foto ampliada">
+    <button type="button" class="close" aria-label="Fechar">
+      <Icon name="x" size={26} />
+    </button>
+    <img alt="" decoding="async" />
+  </dialog>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-gallery]').forEach((root) => {
+    const track = root.querySelector<HTMLElement>('.track')!;
+    const chips = [...root.querySelectorAll<HTMLAnchorElement>('[data-jump]')];
+    const dialog = root.querySelector('dialog')!;
+    const img = dialog.querySelector('img')!;
+
+    chips.forEach((chip) =>
+      chip.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = root.querySelector<HTMLElement>(chip.hash);
+        if (target) track.scrollTo({ left: target.offsetLeft - track.offsetLeft, behavior: 'smooth' });
+      }),
+    );
+
+    // Highlight the chip of the group currently in view.
+    const io = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((en) => {
+          if (!en.isIntersecting) return;
+          chips.forEach((c) => c.classList.toggle('active', c.hash === `#${en.target.id}`));
+        }),
+      { root: track, threshold: 0.5 },
+    );
+    root.querySelectorAll('.group').forEach((g) => io.observe(g));
+
+    root.addEventListener('click', (e) => {
+      const tile = (e.target as Element).closest<HTMLElement>('.tile[data-full]');
+      if (!tile) return;
+      img.src = tile.dataset.full!;
+      img.alt = tile.dataset.alt ?? '';
+      dialog.showModal();
+    });
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog || (e.target as Element).closest('.close')) dialog.close();
+    });
+  });
+</script>
+
+<style>
+  .tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    padding-bottom: 14px;
+  }
+  .tabs::-webkit-scrollbar,
+  .track::-webkit-scrollbar {
+    display: none;
+  }
+  .chip {
+    text-decoration: none;
+    color: var(--muted);
+  }
+  .chip.active {
+    background: var(--yellow);
+    border-color: var(--yellow);
+    color: var(--on-yellow);
+    font-weight: 700;
+  }
+  .track {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    scroll-padding-inline: var(--gutter);
+  }
+  .group {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .tile {
+    position: relative;
+    flex-shrink: 0;
+    width: 78vw;
+    max-width: 360px;
+    aspect-ratio: 4 / 5;
+    border-radius: var(--radius);
+    overflow: hidden;
+    scroll-snap-align: start;
+    padding: 0;
+    border: 0;
+    background: var(--surface);
+    cursor: zoom-in;
+  }
+  .tile :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .tag {
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgb(11 11 11 / 0.75);
+    color: var(--text);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  .placeholder {
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-weight: 600;
+    cursor: default;
+    border: 1px dashed var(--line);
+    background: repeating-linear-gradient(135deg, var(--surface) 0 14px, #121212 14px 28px);
+  }
+  .lightbox {
+    width: 100vw;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: rgb(0 0 0 / 0.94);
+  }
+  .lightbox::backdrop {
+    background: rgb(0 0 0 / 0.8);
+  }
+  .lightbox[open] {
+    display: grid;
+    place-items: center;
+  }
+  .lightbox img {
+    max-width: 100%;
+    max-height: 100dvh;
+    object-fit: contain;
+  }
+  .close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    border: 0;
+    background: rgb(255 255 255 / 0.12);
+    color: #fff;
+    cursor: pointer;
+  }
+</style>

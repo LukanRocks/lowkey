@@ -1,0 +1,56 @@
+---
+import { Picture } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import condominio from '../assets/map/condominio.png';
+import { site } from '../data/site';
+---
+
+<Base
+  title="Mapa do condomínio"
+  description="Mapa do condomínio do Low Key Estúdios: acesso, estacionamento e localização do Galpão e do Casarão."
+>
+  <section class="section">
+    <div class="container narrow">
+      <span class="eyebrow">Como chegar</span>
+      <h1 class="title">Mapa do condomínio</h1>
+      <p class="lead">
+        Estacionamento para até 15 carros no gramado em frente ao Casarão, mais vagas de carga e descarga ao lado do
+        Galpão.
+      </p>
+      <a class="map" href={condominio.src} target="_blank" rel="noopener">
+        <Picture
+          src={condominio}
+          alt="Mapa ilustrado do condomínio com o Galpão, o Casarão Antigo e as vagas de estacionamento"
+          widths={[450]}
+          sizes="(min-width: 500px) 450px, 100vw"
+          formats={['avif', 'webp']}
+          fallbackFormat="webp"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </a>
+      <a class="btn btn-primary" href={site.mapsUrl} target="_blank" rel="noopener" style="margin-top: 24px">
+        <Icon name="pin" />
+        Abrir no Google Maps
+      </a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .narrow {
+    max-width: 720px;
+  }
+  .title {
+    font-size: clamp(2rem, 9vw, 3.4rem);
+  }
+  .map {
+    display: block;
+    max-width: 450px;
+    margin-top: 28px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+</style>

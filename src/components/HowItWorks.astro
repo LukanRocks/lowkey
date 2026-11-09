@@ -1,0 +1,50 @@
+---
+import { comoFunciona } from '../data/compartilhado';
+---
+
+<ol class="steps">
+  {comoFunciona.map((s, i) => (
+    <li>
+      <span class="n">{i + 1}</span>
+      <div>
+        <h3>{s.titulo}</h3>
+        <p class="muted">{s.texto}</p>
+      </div>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .steps {
+    list-style: none;
+    margin: 28px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 22px;
+  }
+  li {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .n {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--yellow);
+    color: var(--on-yellow);
+    font-weight: 900;
+  }
+  h3 {
+    margin-bottom: 4px;
+    margin-top: 8px;
+  }
+  @media (min-width: 900px) {
+    .steps {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

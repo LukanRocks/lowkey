@@ -1,0 +1,123 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import StickyCta from '../components/StickyCta.astro';
+import { espacos, precoMinimo } from '../data/espacos';
+import { site } from '../data/site';
+import { brl } from '../lib/whatsapp';
+
+const beneficios = [
+  'Próximas datas com desconto no Galpão e no Casarão',
+  'Ofertas de locação avisadas primeiro para o grupo',
+  'A hora de fazer aquele ensaio ou vídeo pagando menos',
+];
+---
+
+<Base
+  title="Grupo de descontos no WhatsApp"
+  description="Entre no grupo do WhatsApp do Low Key Estúdios e receba as próximas datas com desconto para locação de estúdio em Curitiba."
+>
+  <section class="landing">
+    <div class="container">
+      <span class="eyebrow">Grupo do WhatsApp</span>
+      <h1>
+        Estúdio com <mark>desconto</mark>
+      </h1>
+      <p class="lead">
+        Entre no grupo do WhatsApp e fique por dentro das ofertas de locação. A hora de fazer aquele ensaio ou vídeo
+        pagando menos é agora.
+      </p>
+      <ul class="check-list benefits">
+        {beneficios.map((b) => (
+          <li>{b}</li>
+        ))}
+      </ul>
+      <a
+        class="btn btn-primary btn-block big"
+        href={site.whatsappGroup}
+        target="_blank"
+        rel="noopener"
+        data-track="whatsapp"
+        data-label="Grupo de descontos – topo"
+      >
+        <Icon name="whatsapp" size={24} />
+        Entrar no grupo
+      </a>
+      <p class="fine">Grátis. Você pode sair do grupo quando quiser.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <span class="eyebrow">Os espaços</span>
+      <h2 style="margin-bottom: 20px">Conheça antes de reservar</h2>
+      <div class="grid-2">
+        {espacos.map((e) => (
+          <a class="space" href={`/${e.slug}`}>
+            <strong>{e.nome}</strong>
+            <span class="muted">{e.chips.slice(0, 3).join(' · ')}</span>
+            <span class="go">
+              A partir de R$ {brl(precoMinimo(e))} <Icon name="arrow" />
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <StickyCta
+    slot="cta"
+    href={site.whatsappGroup}
+    label="Entrar no grupo de descontos"
+    trackLabel="Grupo de descontos – barra fixa"
+    icon="percent"
+  />
+</Base>
+
+<style>
+  .landing {
+    padding-block: 56px;
+  }
+  mark {
+    background: var(--yellow);
+    color: var(--on-yellow);
+    padding: 0 0.12em;
+  }
+  .benefits {
+    margin-block: 28px 32px;
+    font-size: 1.05rem;
+  }
+  .big {
+    min-height: 60px;
+    font-size: 1.1rem;
+    max-width: 420px;
+  }
+  .fine {
+    margin-top: 12px;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .space {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 22px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    text-decoration: none;
+  }
+  .space strong {
+    font-size: 1.5rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+  .go {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 6px;
+    font-weight: 700;
+    color: var(--yellow);
+  }
+</style>

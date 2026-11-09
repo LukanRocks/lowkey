@@ -1,0 +1,118 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { cancelamento } from '../data/compartilhado';
+import { site } from '../data/site';
+import { waLink } from '../lib/whatsapp';
+---
+
+<Base
+  title="Política de cancelamento"
+  description="Como funcionam cancelamentos e trocas de data no Low Key Estúdios: reembolso total até 7 dias antes da reserva."
+>
+  <section class="section">
+    <div class="container narrow">
+      <span class="eyebrow">Reservas</span>
+      <h1 class="title">Política de cancelamento</h1>
+      <p class="lead">
+        Quanto antes você avisar, maior o reembolso. As mesmas regras valem para trocar a data da reserva.
+      </p>
+
+      <ol class="timeline">
+        {cancelamento.etapas.map((e, i) => (
+          <li style={`--level: ${1 - i / (cancelamento.etapas.length - 1)}`}>
+            <span class="pct">{e.reembolso}</span>
+            <div>
+              <h2>{e.quando}</h2>
+              <p class="muted">{e.texto}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+
+      <h2 class="sub">Bom saber</h2>
+      <ul class="check-list">
+        {cancelamento.observacoes.map((o) => (
+          <li>{o}</li>
+        ))}
+      </ul>
+
+      <a
+        class="btn btn-primary"
+        style="margin-top: 32px"
+        href={waLink('Olá! Preciso cancelar ou mudar a data da minha reserva.')}
+        target="_blank"
+        rel="noopener"
+        data-track="whatsapp"
+        data-label="Cancelamento"
+      >
+        <Icon name="whatsapp" />
+        Falar com o atendimento
+      </a>
+      <p class="muted" style="margin-top: 12px; font-size: 0.9rem">
+        WhatsApp {site.whatsappDisplay}
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .narrow {
+    max-width: 720px;
+  }
+  .title {
+    font-size: clamp(2rem, 9vw, 3.4rem);
+  }
+  .timeline {
+    list-style: none;
+    margin: 36px 0 48px;
+    padding: 0;
+    position: relative;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 31px;
+    top: 24px;
+    bottom: 24px;
+    width: 2px;
+    background: var(--line);
+  }
+  .timeline li {
+    position: relative;
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+  }
+  .timeline li + li {
+    margin-top: 26px;
+  }
+  .pct {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    font-weight: 900;
+    font-size: 1.05rem;
+    color: var(--text);
+    background: var(--surface-2);
+    border: 3px solid color-mix(in srgb, var(--yellow) calc(var(--level) * 100%), var(--line));
+    box-shadow: 0 0 0 4px var(--bg);
+  }
+  .timeline h2 {
+    font-size: 1.1rem;
+    text-transform: none;
+    letter-spacing: -0.01em;
+    margin: 10px 0 4px;
+  }
+  .timeline li:first-child .pct {
+    background: var(--yellow);
+    color: var(--on-yellow);
+  }
+  .sub {
+    font-size: 1.4rem;
+    margin-bottom: 18px;
+  }
+</style>

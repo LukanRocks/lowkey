@@ -1,0 +1,110 @@
+---
+import { Picture } from 'astro:assets';
+import Icon from './Icon.astro';
+import mapa from '../assets/map/location.png';
+import { site } from '../data/site';
+---
+
+<div class="map-card">
+  <div class="map">
+    <a href={site.mapsUrl} target="_blank" rel="noopener" aria-label="Abrir a localização no Google Maps">
+      <Picture
+        src={mapa}
+        alt="Mapa da região do Low Key Estúdios, na Rua Senador Xavier da Silva"
+        widths={[480]}
+        sizes="(min-width: 760px) 480px, 100vw"
+        formats={['avif', 'webp']}
+        fallbackFormat="webp"
+        loading="lazy"
+      />
+      <span class="pin" aria-hidden="true">
+        <Icon name="pin" size={26} />
+      </span>
+    </a>
+    <span class="attr">© OpenStreetMap</span>
+  </div>
+  <div class="info">
+    <p>
+      <strong>{site.address.street}</strong>
+      <br />
+      <span class="muted">
+        {site.address.district}, {site.address.city} – {site.address.state}
+      </span>
+    </p>
+    <div class="actions">
+      <a class="btn btn-primary" href={site.mapsUrl} target="_blank" rel="noopener">
+        <Icon name="pin" />
+        Abrir no Google Maps
+      </a>
+      <a class="btn btn-ghost" href="/mapa">
+        Ver mapa do condomínio
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .map-card {
+    display: grid;
+    gap: 18px;
+  }
+  .map {
+    position: relative;
+    display: block;
+    border-radius: var(--radius);
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    border: 1px solid var(--line);
+  }
+  .map a {
+    display: block;
+    height: 100%;
+  }
+  .map :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: invert(1) contrast(0.85) brightness(0.9);
+  }
+  .pin {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -100%);
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50% 50% 50% 0;
+    rotate: -45deg;
+    background: var(--yellow);
+    color: var(--on-yellow);
+    box-shadow: 0 6px 18px rgb(0 0 0 / 0.5);
+  }
+  .pin :global(svg) {
+    rotate: 45deg;
+  }
+  .attr {
+    position: absolute;
+    right: 6px;
+    bottom: 6px;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgb(0 0 0 / 0.7);
+    color: var(--muted);
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  @media (min-width: 760px) {
+    .map-card {
+      grid-template-columns: 1.2fr 1fr;
+      align-items: center;
+      gap: 32px;
+    }
+  }
+</style>

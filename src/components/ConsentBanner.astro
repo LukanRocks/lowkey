@@ -1,0 +1,156 @@
+---
+// Loads Vercel Web Analytics and the Meta Pixel only after the visitor accepts.
+// The choice is stored in localStorage; "Preferências de cookies" in the footer reopens it.
+const pixelId = import.meta.env.PUBLIC_META_PIXEL_ID ?? '';
+---
+
+<div class="consent" role="dialog" aria-labelledby="consent-title" aria-live="polite" hidden data-consent>
+  <p id="consent-title">
+    Usamos cookies de análise e anúncios para entender as visitas e melhorar nossas campanhas.
+    <a href="/privacidade">Saiba mais</a>
+  </p>
+  <div class="actions">
+    <button type="button" class="btn btn-ghost" data-consent-choice="denied">
+      Recusar
+    </button>
+    <button type="button" class="btn btn-primary" data-consent-choice="granted">
+      Aceitar
+    </button>
+  </div>
+</div>
+
+<script is:inline define:vars={{ pixelId }}>
+  (() => {
+    const KEY = 'lk-consent';
+    const banner = document.querySelector('[data-consent]');
+    let loaded = false;
+
+    const read = () => {
+      try {
+        return localStorage.getItem(KEY);
+      } catch {
+        return null;
+      }
+    };
+    const write = (v) => {
+      try {
+        localStorage.setItem(KEY, v);
+      } catch {}
+    };
+
+    const addScript = (src) => {
+      const s = document.createElement('script');
+      s.src = src;
+      s.defer = true;
+      document.head.appendChild(s);
+    };
+
+    function loadTrackers() {
+      if (loaded) return;
+      loaded = true;
+      const isLocal = /^(localhost|127\.|\[::1\])/.test(location.hostname);
+
+      // Vercel Web Analytics (served by Vercel itself once Analytics is enabled on the project).
+      if (!isLocal) {
+        window.va =
+          window.va ||
+          function () {
+            (window.vaq = window.vaq || []).push(arguments);
+          };
+        addScript('/_vercel/insights/script.js');
+      }
+
+      // Meta Pixel, only when an ID is configured (PUBLIC_META_PIXEL_ID).
+      if (pixelId) {
+        !(function (f, b, e, v, n, t, s) {
+          if (f.fbq) return;
+          n = f.fbq = function () {
+            n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+          };
+          if (!f._fbq) f._fbq = n;
+          n.push = n;
+          n.loaded = true;
+          n.version = '2.0';
+          n.queue = [];
+          t = b.createElement(e);
+          t.async = true;
+          t.src = v;
+          s = b.getElementsByTagName(e)[0];
+          s.parentNode.insertBefore(t, s);
+        })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+        window.fbq('init', pixelId);
+        window.fbq('track', 'PageView');
+      }
+    }
+
+    function decide(choice) {
+      write(choice);
+      banner.hidden = true;
+      if (choice === 'granted') loadTrackers();
+    }
+
+    const stored = read();
+    if (stored === 'granted') loadTrackers();
+    else if (!stored) banner.hidden = false;
+
+    document.addEventListener('click', (e) => {
+      const target = e.target instanceof Element ? e.target : null;
+      if (!target) return;
+
+      const choice = target.closest('[data-consent-choice]');
+      if (choice) return decide(choice.getAttribute('data-consent-choice'));
+
+      if (target.closest('[data-consent-open]')) {
+        banner.hidden = false;
+        return;
+      }
+
+      // Every WhatsApp button counts as a lead, labeled by space and plan.
+      const wa = target.closest('[data-track="whatsapp"]');
+      if (wa && read() === 'granted') {
+        const label = wa.getAttribute('data-label') || '';
+        if (window.fbq) window.fbq('track', 'Contact', { content_name: label });
+        if (window.va) window.va('event', { name: 'whatsapp', data: { label } });
+      }
+    });
+  })();
+</script>
+
+<style>
+  .consent {
+    position: fixed;
+    z-index: 50;
+    left: var(--gutter);
+    right: var(--gutter);
+    bottom: calc(var(--cta-h) + 8px);
+    max-width: 440px;
+    padding: 16px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    box-shadow: 0 12px 40px rgb(0 0 0 / 0.6);
+  }
+  .consent[hidden] {
+    display: none;
+  }
+  .consent a {
+    color: var(--yellow);
+  }
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .actions .btn {
+    min-height: 44px;
+    font-size: 0.95rem;
+  }
+  @media (min-width: 900px) {
+    .consent {
+      bottom: 24px;
+    }
+  }
+</style>

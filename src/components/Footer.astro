@@ -1,0 +1,120 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { nav, site } from '../data/site';
+import { waLink } from '../lib/whatsapp';
+---
+
+<footer class="footer">
+  <div class="container">
+    <div class="top">
+      <div class="brand">
+        <Logo size={44} />
+        <p>
+          <strong>Low Key Estúdios</strong>
+          <br />
+          <span class="muted">Locação de estúdios desde {site.since}</span>
+        </p>
+      </div>
+      <div class="social">
+        <a href={site.instagram} aria-label="Instagram" rel="noopener" target="_blank">
+          <Icon name="instagram" size={22} />
+        </a>
+        <a href={site.facebook} aria-label="Facebook" rel="noopener" target="_blank">
+          <Icon name="facebook" size={22} />
+        </a>
+        <a
+          href={waLink('Olá! Vim pelo site do Low Key Estúdios.')}
+          aria-label="WhatsApp"
+          rel="noopener"
+          target="_blank"
+          data-track="whatsapp"
+          data-label="Rodapé"
+        >
+          <Icon name="whatsapp" size={22} />
+        </a>
+      </div>
+    </div>
+
+    <nav class="links" aria-label="Rodapé">
+      {nav.map((item) => (
+        <a href={item.href}>{item.label}</a>
+      ))}
+      <a href="/mapa">Mapa do condomínio</a>
+      <a href="/privacidade">Privacidade</a>
+      <button type="button" class="link-btn" data-consent-open>
+        Preferências de cookies
+      </button>
+    </nav>
+
+    <address class="muted">
+      {site.address.street}, {site.address.district}
+      <br />
+      {site.address.city} – {site.address.state}, {site.address.postalCode}
+      <br />
+      WhatsApp {site.whatsappDisplay}
+    </address>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--line);
+    padding-block: 48px 40px;
+    font-size: 0.95rem;
+  }
+  .top {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .brand {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    line-height: 1.4;
+  }
+  .social {
+    display: flex;
+    gap: 8px;
+  }
+  .social a {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+  }
+  .links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px 16px;
+    margin-block: 32px 24px;
+  }
+  .links a,
+  .link-btn {
+    padding-block: 10px;
+    color: var(--muted);
+    text-decoration: none;
+    text-align: left;
+  }
+  .link-btn {
+    background: none;
+    border: 0;
+    padding-inline: 0;
+    font: inherit;
+    cursor: pointer;
+  }
+  .links a:hover,
+  .link-btn:hover {
+    color: var(--text);
+  }
+  address {
+    font-style: normal;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+</style>

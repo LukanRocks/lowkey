@@ -1,0 +1,165 @@
+---
+import Icon from './Icon.astro';
+import type { Espaco } from '../data/espacos';
+import { brl, waLink } from '../lib/whatsapp';
+
+interface Props {
+  espaco: Espaco;
+}
+const { espaco } = Astro.props;
+---
+
+<div class="plans">
+  {espaco.planos.map((p) => {
+    const economia = p.precoNoDia ? p.precoNoDia - p.preco : 0;
+    const label = `${espaco.nome} – ${p.nome} (${p.horas}h)`;
+    return (
+      <article class:list={['plan', { featured: p.destaque }]}>
+        <header>
+          <h3>
+            {p.nome} <span>· {p.horas}h</span>
+          </h3>
+          {p.destaque && <span class="badge">Mais pedido</span>}
+        </header>
+        <p class="price">
+          <small>R$</small>
+          {brl(p.preco)}
+          {p.precoNoDia && <s aria-label={`em vez de R$ ${brl(p.precoNoDia)}`}>R$ {brl(p.precoNoDia)}</s>}
+        </p>
+        <p class="terms">
+          {p.precoNoDia ? (
+            <>
+              Pagando na reserva. <span class="save">Economize R$ {brl(economia)}</span>
+              <br />
+              Ou R$ {brl(p.precoNoDia)} pagando no dia do uso.
+            </>
+          ) : (
+            <>Valor único, pago na reserva.</>
+          )}
+        </p>
+        <p class="desc">{p.descricao}</p>
+        <a
+          class:list={['btn', 'btn-block', p.destaque ? 'btn-primary' : 'btn-ghost']}
+          href={waLink(`Olá! Quero reservar o ${label}. Qual a próxima data disponível?`)}
+          target="_blank"
+          rel="noopener"
+          data-track="whatsapp"
+          data-label={label}
+        >
+          <Icon name="whatsapp" size={20} />
+          Reservar {p.nome}
+        </a>
+      </article>
+    );
+  })}
+</div>
+
+<p class="quote">
+  Precisa de outro período?{' '}
+  <a
+    href={waLink(`Olá! Quero um orçamento para o ${espaco.nome} com um período diferente.`)}
+    target="_blank"
+    rel="noopener"
+    data-track="whatsapp"
+    data-label={`${espaco.nome} – orçamento`}
+  >
+    Peça um orçamento
+  </a>
+</p>
+
+<style>
+  .plans {
+    display: grid;
+    gap: 14px;
+    margin-top: 28px;
+  }
+  .plan {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 22px 20px 20px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+  .plan.featured {
+    border: 2px solid var(--yellow);
+    background: #17160a;
+  }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+  h3 {
+    font-size: 1.2rem;
+    text-transform: uppercase;
+  }
+  h3 span {
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .badge {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: var(--yellow);
+    color: var(--on-yellow);
+  }
+  .price {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 2.75rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .price small {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .price s {
+    margin-left: 6px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0;
+  }
+  .terms {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .save {
+    color: var(--yellow);
+    font-weight: 700;
+  }
+  .desc {
+    font-size: 0.95rem;
+    flex-grow: 1;
+  }
+  .btn {
+    margin-top: 6px;
+  }
+  .quote {
+    margin-top: 18px;
+    color: var(--muted);
+  }
+  .quote a {
+    color: var(--yellow);
+    font-weight: 700;
+  }
+  @media (min-width: 900px) {
+    .plans {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: stretch;
+    }
+  }
+</style>

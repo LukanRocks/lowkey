@@ -1,0 +1,357 @@
+---
+import { Picture } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import HowItWorks from '../components/HowItWorks.astro';
+import Equipment from '../components/Equipment.astro';
+import MapCard from '../components/MapCard.astro';
+import StickyCta from '../components/StickyCta.astro';
+import { espacos, precoMinimo } from '../data/espacos';
+import { diferenciais, servicosAdicionais } from '../data/compartilhado';
+import { site } from '../data/site';
+import { brl, waLink } from '../lib/whatsapp';
+import { fotosDe } from '../lib/galeria';
+
+const cards = espacos.map((e) => ({
+  e,
+  capa: fotosDe(`${e.slug}/${e.galeria[0].pasta}`, e.nome)[0],
+  minimo: precoMinimo(e),
+}));
+const portfolio = fotosDe('portfolio', 'Trabalho produzido no Low Key Estúdios');
+// Mock entries shown until real portfolio photos are added to src/assets/galeria/portfolio/.
+const portfolioMock = [
+  'Campanha de moda',
+  'Ensaio de marca',
+  'Videoclipe',
+  'Lookbook',
+  'Conteúdo para redes',
+  'Retratos corporativos',
+];
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  name: site.name,
+  description: 'Locação de estúdios para foto e vídeo no centro de Curitiba.',
+  url: Astro.site?.href,
+  telephone: '+55 41 99276-8015',
+  foundingDate: String(site.since),
+  sameAs: [site.instagram, site.facebook],
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: site.address.street,
+    addressLocality: site.address.city,
+    addressRegion: site.address.state,
+    postalCode: site.address.postalCode,
+    addressCountry: 'BR',
+  },
+  geo: { '@type': 'GeoCoordinates', latitude: site.address.lat, longitude: site.address.lng },
+};
+---
+
+<Base
+  title="Low Key Estúdios: estúdios para foto e vídeo em Curitiba"
+  description="Dois espaços no centro de Curitiba: o Estúdio Galpão, com 150 m² e fundo infinito, e o Casarão Antigo, um casarão de época para cenários. Reserve pelo WhatsApp."
+  schema={schema}
+>
+  <section class="hero">
+    <div class="container">
+      <span class="eyebrow">Curitiba · desde {site.since}</span>
+      <h1>
+        Estúdios para foto e vídeo<span class="dot">.</span>
+      </h1>
+      <p class="lead">
+        Dois espaços no centro de Curitiba para fotógrafos, agências e marcas. Self check-in, equipamentos inclusos na
+        reserva e atendimento direto pelo WhatsApp.
+      </p>
+    </div>
+  </section>
+
+  <section class="spaces container" aria-label="Espaços">
+    {cards.map(({ e, capa, minimo }, i) => (
+      <a class="space" href={`/${e.slug}`}>
+        <div class="space-media">
+          {capa ? (
+            <Picture
+              src={capa.src}
+              alt=""
+              widths={[480, 828, 1200]}
+              sizes="(min-width: 760px) 50vw, 100vw"
+              formats={['avif', 'webp']}
+              fallbackFormat="webp"
+              loading={i === 0 ? 'eager' : 'lazy'}
+              fetchpriority={i === 0 ? 'high' : undefined}
+            />
+          ) : (
+            <div class="ph" aria-hidden="true">
+              <Icon name="camera" size={28} />
+            </div>
+          )}
+        </div>
+        <div class="space-body">
+          <h2>{e.nome}</h2>
+          <p class="muted">{e.resumo}</p>
+          <ul class="chips">
+            {e.chips.slice(0, 3).map((c) => (
+              <li class="chip">{c}</li>
+            ))}
+          </ul>
+          <span class="go">
+            A partir de R$ {brl(minimo)}
+            <Icon name="arrow" />
+          </span>
+        </div>
+      </a>
+    ))}
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <span class="eyebrow">Como funciona</span>
+      <h2>Reservar é simples</h2>
+      <HowItWorks />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <span class="eyebrow">Nos dois espaços</span>
+      <h2>Feito para produzir sem complicação</h2>
+      <div class="perks">
+        {diferenciais.map((d, i) => (
+          <div class="card">
+            <Icon name={(['key', 'pin', 'car', 'shield'] as const)[i]} size={26} class="perk-icon" />
+            <h3>{d.titulo}</h3>
+            <p class="muted">{d.texto}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <span class="eyebrow">Equipamentos</span>
+      <h2>Luz e estrutura inclusas</h2>
+      <p class="lead" style="margin-bottom: 28px">
+        Todos os equipamentos estão inclusos no valor da reserva, no Galpão e no Casarão.
+      </p>
+      <div class="card">
+        <Equipment />
+      </div>
+      <div class="services">
+        <h3>Serviços adicionais</h3>
+        <ul class="check-list">
+          {servicosAdicionais.map((s) => (
+            <li>{s}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <span class="eyebrow">Portfólio</span>
+      <h2>Produzido aqui</h2>
+      <p class="lead">Trabalhos de fotógrafos, agências e marcas que passaram pelo Low Key.</p>
+      <div class="portfolio">
+        {portfolio.length > 0
+          ? portfolio.map((f) => (
+              <Picture
+                src={f.src}
+                alt={f.alt}
+                widths={[320, 640]}
+                sizes="(min-width: 760px) 33vw, 50vw"
+                formats={['avif', 'webp']}
+                fallbackFormat="webp"
+                loading="lazy"
+              />
+            ))
+          : portfolioMock.map((t) => (
+              <div class="pf-mock">
+                <span>{t}</span>
+                <small>Cliente</small>
+              </div>
+            ))}
+      </div>
+      <a class="btn btn-ghost" href={site.instagram} target="_blank" rel="noopener" style="margin-top: 20px">
+        <Icon name="instagram" />
+        Ver mais no {site.instagramHandle}
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <a class="group-cta" href="/grupo-de-whatsapp">
+        <Icon name="percent" size={28} />
+        <span>
+          <strong>Datas com desconto</strong>
+          <span>Entre no grupo do WhatsApp e receba as ofertas primeiro.</span>
+        </span>
+        <Icon name="arrow" size={24} />
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <span class="eyebrow">Localização</span>
+      <h2 style="margin-bottom: 24px">Centro de Curitiba</h2>
+      <MapCard />
+    </div>
+  </section>
+
+  <StickyCta
+    slot="cta"
+    href={waLink('Olá! Quero reservar um estúdio no Low Key. Qual a próxima data disponível?')}
+    label="Reservar pelo WhatsApp"
+    trackLabel="Início – barra fixa"
+  />
+</Base>
+
+<style>
+  .hero {
+    padding-block: 56px 32px;
+  }
+  .dot {
+    color: var(--yellow);
+  }
+  .spaces {
+    display: grid;
+    gap: 16px;
+    padding-bottom: 56px;
+  }
+  .space {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--surface);
+    transition: border-color 0.15s ease;
+  }
+  .space:hover {
+    border-color: var(--yellow);
+  }
+  .space-media {
+    aspect-ratio: 16 / 10;
+    background: var(--surface-2);
+  }
+  .space-media :global(img),
+  .ph {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .ph {
+    display: grid;
+    place-items: center;
+    color: #444;
+    background: repeating-linear-gradient(135deg, #141414 0 14px, #101010 14px 28px);
+  }
+  .space-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px;
+  }
+  .go {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 800;
+    color: var(--yellow);
+    font-size: 1.05rem;
+  }
+  .perks {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 28px;
+  }
+  .perks .card {
+    padding: 18px;
+  }
+  .perks h3 {
+    margin: 12px 0 6px;
+    font-size: 1.05rem;
+  }
+  .perks p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  .perks :global(.perk-icon) {
+    color: var(--yellow);
+  }
+  .services {
+    margin-top: 28px;
+  }
+  .services h3 {
+    margin-bottom: 14px;
+  }
+  .portfolio {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 28px;
+  }
+  .portfolio :global(img),
+  .pf-mock {
+    aspect-ratio: 1;
+    width: 100%;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+  }
+  .pf-mock {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 12px;
+    font-weight: 700;
+    line-height: 1.2;
+    background: repeating-linear-gradient(135deg, var(--surface) 0 14px, #121212 14px 28px);
+    border: 1px dashed var(--line);
+  }
+  .pf-mock small {
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .group-cta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 22px;
+    border-radius: var(--radius);
+    background: var(--yellow);
+    color: var(--on-yellow);
+    text-decoration: none;
+  }
+  .group-cta > span {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.35;
+  }
+  .group-cta strong {
+    font-size: 1.3rem;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+  @media (min-width: 760px) {
+    .hero {
+      padding-block: 96px 48px;
+    }
+    .spaces {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .perks {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .portfolio {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

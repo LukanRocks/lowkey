@@ -1,0 +1,50 @@
+---
+// DRAFT: review with the business owner before publishing.
+import Base from '../layouts/Base.astro';
+import { site } from '../data/site';
+---
+
+<Base title="Privacidade e cookies" description="Como o Low Key Estúdios usa cookies de análise e anúncios neste site.">
+  <section class="section">
+    <div class="container narrow stack">
+      <span class="eyebrow">Privacidade</span>
+      <h1 class="title">Privacidade e cookies</h1>
+      <p class="lead">Este site não tem cadastro nem formulários. As reservas acontecem pelo WhatsApp.</p>
+      <h2>Cookies de análise e anúncios</h2>
+      <p>
+        Só com a sua permissão usamos o Vercel Web Analytics, para contar visitas, e o Meta Pixel, para medir os
+        resultados dos nossos anúncios no Instagram e no Facebook. Se você recusar, nenhum dos dois é carregado.
+      </p>
+      <p>
+        Você pode mudar a sua escolha a qualquer momento:
+        <button type="button" class="inline" data-consent-open>
+          abrir preferências de cookies
+        </button>
+      </p>
+      <h2>Contato</h2>
+      <p>Dúvidas sobre os seus dados: WhatsApp {site.whatsappDisplay}.</p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .narrow {
+    max-width: 720px;
+  }
+  .title {
+    font-size: clamp(2rem, 9vw, 3.4rem);
+  }
+  h2 {
+    font-size: 1.3rem;
+    padding-top: 12px;
+  }
+  .inline {
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    color: var(--yellow);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+</style>

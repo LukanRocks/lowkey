@@ -1,0 +1,56 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  href: string;
+  label: string;
+  trackLabel: string;
+  icon?: 'whatsapp' | 'percent';
+}
+const { href, label, trackLabel, icon = 'whatsapp' } = Astro.props;
+---
+
+<div class="sticky-cta">
+  <a
+    class="btn btn-primary btn-block"
+    href={href}
+    target="_blank"
+    rel="noopener"
+    data-track="whatsapp"
+    data-label={trackLabel}
+  >
+    <Icon name={icon} size={22} />
+    {label}
+  </a>
+</div>
+
+<style is:global>
+  body:has(.sticky-cta) {
+    --cta-h: 84px;
+  }
+</style>
+
+<style>
+  .sticky-cta {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    padding: 12px var(--gutter) calc(12px + env(safe-area-inset-bottom));
+    background: linear-gradient(to top, var(--bg) 60%, transparent);
+  }
+  @media (min-width: 900px) {
+    .sticky-cta {
+      left: auto;
+      right: 24px;
+      bottom: 24px;
+      padding: 0;
+      background: none;
+    }
+    .sticky-cta .btn {
+      width: auto;
+      box-shadow: 0 10px 30px rgb(0 0 0 / 0.5);
+    }
+  }
+</style>

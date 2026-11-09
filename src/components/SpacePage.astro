@@ -1,0 +1,463 @@
+---
+// One template for both spaces; everything it shows comes from src/data/espacos.ts.
+import { Picture } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Gallery from './Gallery.astro';
+import Pricing from './Pricing.astro';
+import Accordion from './Accordion.astro';
+import Equipment from './Equipment.astro';
+import HowItWorks from './HowItWorks.astro';
+import MapCard from './MapCard.astro';
+import StickyCta from './StickyCta.astro';
+import Icon from './Icon.astro';
+import { espacos, precoMinimo, type Espaco } from '../data/espacos';
+import { servicosAdicionais, regrasGerais } from '../data/compartilhado';
+import { site } from '../data/site';
+import { brl, waLink } from '../lib/whatsapp';
+import { fotosDe } from '../lib/galeria';
+
+interface Props {
+  espaco: Espaco;
+  description: string;
+}
+const { espaco: e, description } = Astro.props;
+const outro = espacos.find((x) => x.slug !== e.slug)!;
+const minimo = precoMinimo(e);
+const capa = fotosDe(`${e.slug}/${e.galeria[0].pasta}`, e.nome)[0];
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Place',
+  name: `${e.nome} – ${site.name}`,
+  description,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: site.address.street,
+    addressLocality: site.address.city,
+    addressRegion: site.address.state,
+    postalCode: site.address.postalCode,
+    addressCountry: 'BR',
+  },
+  geo: { '@type': 'GeoCoordinates', latitude: site.address.lat, longitude: site.address.lng },
+};
+---
+
+<Base title={`${e.nome} em Curitiba`} description={description} schema={schema}>
+  <section class="hero">
+    <div class="media" aria-hidden={capa ? undefined : 'true'}>
+      {capa ? (
+        <Picture
+          src={capa.src}
+          alt={capa.alt}
+          widths={[480, 828, 1280, 1920]}
+          sizes="100vw"
+          formats={['avif', 'webp']}
+          fallbackFormat="webp"
+          loading="eager"
+          fetchpriority="high"
+        />
+      ) : (
+        <div class="hero-placeholder">
+          <Icon name="camera" size={32} />
+          <span>Foto de capa</span>
+        </div>
+      )}
+    </div>
+    <div class="container hero-content">
+      <span class="eyebrow">Centro de Curitiba · desde {site.since}</span>
+      <h1>{e.titulo}</h1>
+      <p class="lead">{e.resumo}</p>
+      <ul class="chips">
+        {e.chips.map((c) => (
+          <li class="chip">{c}</li>
+        ))}
+      </ul>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#precos">
+          Ver preços
+          <Icon name="arrow" />
+        </a>
+        {e.cta.visita && (
+          <a
+            class="btn btn-ghost"
+            href={waLink(`Olá! Gostaria de agendar uma visita ao ${e.nome}.`)}
+            target="_blank"
+            rel="noopener"
+            data-track="whatsapp"
+            data-label={`${e.nome} – visita`}
+          >
+            <Icon name="calendar" />
+            Agendar visita
+          </a>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="galeria">
+    <div class="container">
+      <span class="eyebrow">Galeria</span>
+      <h2>Onde você vai produzir</h2>
+      <div style="margin-top: 24px">
+        <Gallery espaco={e.slug} nome={e.nome} categorias={e.galeria} />
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container grid-2 about">
+      <div class="stack">
+        <span class="eyebrow">Sobre o espaço</span>
+        <h2>{e.estado.titulo}</h2>
+        <p class="lead">{e.estado.texto}</p>
+        {e.sobre.map((p) => (
+          <p>{p}</p>
+        ))}
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom: 16px">Destaques</h3>
+        <ul class="check-list">
+          {e.destaques.map((d) => (
+            <li>{d}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    {e.medidas && (
+      <div class="container">
+        <dl class="measures">
+          {e.medidas.map((m) => (
+            <div>
+              <dt>{m.label}</dt>
+              <dd>{m.valor}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    )}
+
+    {e.ambientes && (
+      <div class="container grid-2 floors">
+        {e.ambientes.map((a) => (
+          <div class="card">
+            <h3 style="margin-bottom: 14px">{a.andar}</h3>
+            <ul class="check-list">
+              {a.itens.map((i) => (
+                <li>{i}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    )}
+  </section>
+
+  <section class="section" id="precos">
+    <div class="container">
+      <span class="eyebrow">Preços</span>
+      <h2>Escolha o período</h2>
+      <p class="lead">Reserve pagando na hora da reserva e pague menos. Também dá para pagar no dia do uso.</p>
+      <Pricing espaco={e} />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <span class="eyebrow">Como funciona</span>
+      <h2>Reservar é simples</h2>
+      <HowItWorks />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <span class="eyebrow">Detalhes</span>
+      <h2 style="margin-bottom: 24px">Antes de reservar</h2>
+
+      <div class="callout">
+        <Icon name="info" size={22} />
+        <p>{e.observacao}</p>
+      </div>
+
+      <Accordion title="O que você precisa saber" hint="Planejamento do período e regras do espaço" open>
+        <ul class="check-list">
+          {e.saberAntes.map((s) => (
+            <li>{s}</li>
+          ))}
+          {e.regras.map((s) => (
+            <li>{s}</li>
+          ))}
+          {regrasGerais.map((s) => (
+            <li>{s}</li>
+          ))}
+        </ul>
+      </Accordion>
+
+      <Accordion title="O que o espaço oferece" hint={`${e.comodidades.length} itens inclusos`}>
+        <ul class="check-list">
+          {e.comodidades.map((c) => (
+            <li>{c}</li>
+          ))}
+        </ul>
+      </Accordion>
+
+      <Accordion title="Equipamentos inclusos" hint="Iluminação, suportes e modificadores sem custo extra">
+        <Equipment />
+      </Accordion>
+
+      <Accordion title="Taxas e adicionais" hint="Valores sob consulta">
+        <div class="fees">
+          {e.taxas.map((g) => (
+            <div>
+              <h3>{g.titulo}</h3>
+              <dl>
+                {g.itens.map((i) => (
+                  <div>
+                    <dt>{i.nome}</dt>
+                    <dd>{i.descricao}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          ))}
+          <div>
+            <h3>Serviços adicionais</h3>
+            <ul class="check-list">
+              {servicosAdicionais.map((s) => (
+                <li>{s}</li>
+              ))}
+              <li>
+                Locação do <a href={`/${outro.slug}`}>{outro.nome}</a> na mesma produção
+              </li>
+            </ul>
+          </div>
+        </div>
+        <a
+          class="btn btn-ghost"
+          style="margin-top: 20px"
+          href={waLink(`Olá! Quero um orçamento com taxas e adicionais para o ${e.nome}.`)}
+          target="_blank"
+          rel="noopener"
+          data-track="whatsapp"
+          data-label={`${e.nome} – taxas`}
+        >
+          Pedir orçamento de adicionais
+        </a>
+      </Accordion>
+
+      <a class="policy-link" href="/politica-de-cancelamento">
+        <span>
+          <strong>Política de cancelamento</strong>
+          <small>Reembolso total até 7 dias antes</small>
+        </span>
+        <Icon name="arrow" size={22} />
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <span class="eyebrow">Localização</span>
+      <h2 style="margin-bottom: 24px">Onde você vai estar</h2>
+      <MapCard />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <a class="other" href={`/${outro.slug}`}>
+        <span class="eyebrow">Conheça também</span>
+        <strong>{outro.nome}</strong>
+        <span class="muted">{outro.resumo}</span>
+        <span class="go">
+          A partir de R$ {brl(precoMinimo(outro))} <Icon name="arrow" />
+        </span>
+      </a>
+    </div>
+  </section>
+
+  <StickyCta
+    slot="cta"
+    href={waLink(`Olá! Quero reservar o ${e.nome}. Qual a próxima data disponível?`)}
+    label={`Reservar · a partir de R$ ${brl(minimo)}`}
+    trackLabel={`${e.nome} – barra fixa`}
+  />
+</Base>
+
+<style>
+  .hero {
+    position: relative;
+    display: grid;
+    min-height: min(88svh, 760px);
+    align-items: end;
+    overflow: hidden;
+  }
+  .media,
+  .hero-content {
+    grid-area: 1 / 1;
+  }
+  .media {
+    position: absolute;
+    inset: 0;
+  }
+  .media :global(img),
+  .hero-placeholder {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, var(--bg) 8%, rgb(11 11 11 / 0.55) 55%, rgb(11 11 11 / 0.2));
+  }
+  .hero-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 18svh;
+    gap: 8px;
+    color: #444;
+    font-weight: 700;
+    background: repeating-linear-gradient(135deg, #141414 0 18px, #101010 18px 36px);
+  }
+  .hero-content {
+    position: relative;
+    padding-block: 120px 40px;
+  }
+  .hero .chips {
+    margin-top: 20px;
+  }
+  .hero .chip {
+    background: rgb(21 21 21 / 0.8);
+  }
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 24px;
+  }
+  .about {
+    align-items: start;
+  }
+  .measures {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    margin: 28px 0 0;
+  }
+  .measures div {
+    padding: 14px 10px;
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    text-align: center;
+  }
+  .measures dt {
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+  .measures dd {
+    margin: 2px 0 0;
+    font-size: 1.3rem;
+    font-weight: 800;
+  }
+  .floors {
+    margin-top: 16px;
+  }
+  .callout {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 16px 18px;
+    margin-bottom: 14px;
+    border-radius: var(--radius);
+    border: 1px solid #4a4500;
+    background: #181700;
+    color: #fff9a8;
+  }
+  .callout :global(svg) {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .fees {
+    display: grid;
+    gap: 26px;
+  }
+  .fees h3 {
+    margin: 0 0 10px;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--yellow);
+  }
+  .fees dl {
+    margin: 0;
+  }
+  .fees dl div + div {
+    margin-top: 12px;
+  }
+  .fees dt {
+    font-weight: 700;
+  }
+  .fees dd {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+  .fees a {
+    color: var(--yellow);
+  }
+  .policy-link,
+  .other {
+    display: flex;
+    text-decoration: none;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+  .policy-link {
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    padding: 18px 20px;
+  }
+  .policy-link span {
+    display: flex;
+    flex-direction: column;
+  }
+  .policy-link small {
+    color: var(--muted);
+  }
+  .other {
+    flex-direction: column;
+    gap: 8px;
+    padding: 24px;
+    background: var(--surface);
+  }
+  .other strong {
+    font-size: 1.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+  .other .eyebrow {
+    margin: 0;
+  }
+  .go {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 8px;
+    font-weight: 700;
+    color: var(--yellow);
+  }
+  @media (min-width: 760px) {
+    .fees {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>
