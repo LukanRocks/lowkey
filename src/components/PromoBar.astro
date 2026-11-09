@@ -1,0 +1,119 @@
+---
+// Floating pill under the nav, linking to the discount group. Lives inside the sticky
+// header; it hides while scrolling down and comes back when scrolling up or at the top.
+// Not shown on the group page itself.
+import Icon from './Icon.astro';
+---
+
+<a class="promo" href="/grupo-de-whatsapp" data-promo>
+  <span class="fire" aria-hidden="true">
+    🔥
+  </span>
+  Próximas datas com desconto
+  <Icon name="arrow" size={16} class="promo-arrow" />
+</a>
+
+<script>
+  const promo = document.querySelector<HTMLElement>('[data-promo]');
+  if (promo) {
+    let lastY = window.scrollY;
+    let ticking = false;
+    const update = () => {
+      const y = window.scrollY;
+      // Ignore tiny jitters (iOS bounce, address bar resize).
+      if (Math.abs(y - lastY) > 6) {
+        promo.classList.toggle('is-hidden', y > lastY && y > 80);
+        lastY = y;
+      }
+      ticking = false;
+    };
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(update);
+        }
+      },
+      { passive: true },
+    );
+  }
+</script>
+
+<style>
+  .promo {
+    position: absolute;
+    z-index: 1;
+    top: calc(100% + 10px);
+    left: 50%;
+    translate: -50% 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 36px;
+    padding: 6px 14px 6px 12px;
+    border-radius: 999px;
+    background: #c42d16;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    white-space: nowrap;
+    text-decoration: none;
+    box-shadow:
+      0 8px 24px rgb(196 45 22 / 0.35),
+      0 0 0 1px rgb(255 255 255 / 0.08) inset;
+    animation: drop-in 0.4s ease-out backwards;
+    transition:
+      background-color 0.15s ease,
+      scale 0.15s ease,
+      opacity 0.25s ease,
+      translate 0.25s ease,
+      visibility 0.25s;
+  }
+  .promo.is-hidden {
+    opacity: 0;
+    translate: -50% -14px;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .promo:hover {
+    background: #d73419;
+  }
+  .promo:active {
+    scale: 0.97;
+  }
+  .promo :global(.promo-arrow) {
+    flex-shrink: 0;
+    transition: transform 0.15s ease;
+  }
+  .promo:hover :global(.promo-arrow) {
+    transform: translateX(3px);
+  }
+  .fire {
+    display: inline-block;
+    transform-origin: 50% 90%;
+    animation: flicker 1.6s ease-in-out infinite;
+  }
+  @keyframes flicker {
+    0%,
+    100% {
+      transform: scale(1) rotate(-4deg);
+    }
+    50% {
+      transform: scale(1.15) rotate(4deg);
+    }
+  }
+  @keyframes drop-in {
+    from {
+      opacity: 0;
+      translate: -50% -6px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .promo,
+    .fire {
+      animation: none;
+      transition: none;
+    }
+  }
+</style>

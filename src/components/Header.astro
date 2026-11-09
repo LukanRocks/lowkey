@@ -1,6 +1,7 @@
 ---
 import Logo from './Logo.astro';
 import Icon from './Icon.astro';
+import PromoBar from './PromoBar.astro';
 import { nav } from '../data/site';
 
 const current = Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/';
@@ -38,6 +39,7 @@ const current = Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '') || 
       </nav>
     </details>
   </div>
+  {current !== '/grupo-de-whatsapp' && <PromoBar />}
 </header>
 
 <style>
@@ -94,6 +96,7 @@ const current = Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '') || 
   }
   .sheet {
     position: absolute;
+    z-index: 2;
     left: 0;
     right: 0;
     top: 60px;
