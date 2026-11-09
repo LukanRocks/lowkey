@@ -1,0 +1,188 @@
+---
+import { Picture } from 'astro:assets';
+import Icon from '../Icon.astro';
+import { natal } from '../../data/natal';
+import { fotosDe } from '../../lib/galeria';
+
+interface Props {
+  eyebrow: string;
+  lead: string;
+  chips: string[];
+  cta: { href: string; label: string; track: string };
+}
+const { eyebrow, lead, chips, cta } = Astro.props;
+const primeiro = natal.cenarios[0];
+const capa = fotosDe(`natal/${primeiro.pasta}`, `Casarão Antigo decorado para o Natal: ${primeiro.nome}`)[0];
+---
+
+<section class="hero">
+  <div class="stripe" aria-hidden="true"></div>
+  <div class="container">
+    {natal.rascunho && (
+      <p class="draft" role="note">
+        Rascunho: preços e detalhes a confirmar
+      </p>
+    )}
+    <span class="ribbon">
+      <Icon name="snowflake" size={16} />
+      {natal.periodo} · {natal.vagas}
+    </span>
+    <span class="eyebrow">{eyebrow}</span>
+    <h1>
+      <slot />
+    </h1>
+    <p class="lead">{lead}</p>
+    <ul class="chips">
+      {chips.map((c) => (
+        <li class="chip">{c}</li>
+      ))}
+    </ul>
+    <a
+      class="btn btn-primary cta"
+      href={cta.href}
+      target="_blank"
+      rel="noopener"
+      data-track="whatsapp"
+      data-label={cta.track}
+    >
+      <Icon name="whatsapp" size={22} />
+      {cta.label}
+    </a>
+
+    <div class="cover">
+      {capa ? (
+        <Picture
+          src={capa.src}
+          alt={capa.alt}
+          widths={[480, 828, 1280]}
+          sizes="(min-width: 1120px) 1088px, 100vw"
+          formats={['avif', 'webp']}
+          fallbackFormat="webp"
+          loading="eager"
+          fetchpriority="high"
+        />
+      ) : (
+        <div class="ph" aria-hidden="true">
+          <Icon name="gift" size={34} />
+          <span>Foto do Casarão decorado</span>
+        </div>
+      )}
+      <span class="deco d1" aria-hidden="true">
+        <Icon name="star" size={22} />
+      </span>
+      <span class="deco d2" aria-hidden="true">
+        <Icon name="snowflake" size={26} />
+      </span>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    padding-bottom: 48px;
+    overflow: hidden;
+  }
+  .stripe {
+    height: 8px;
+    background: repeating-linear-gradient(-45deg, var(--yellow) 0 10px, #fff 10px 20px);
+  }
+  .container {
+    padding-top: 28px;
+  }
+  .draft {
+    margin-bottom: 16px;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px dashed var(--gold);
+    background: #fdf6e6;
+    color: #6b4f12;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .ribbon {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 18px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: var(--green);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+  .eyebrow {
+    display: block;
+  }
+  h1 {
+    font-size: clamp(2.3rem, 10.5vw, 4.4rem);
+  }
+  .chips {
+    margin-top: 20px;
+  }
+  .chip {
+    background: var(--surface);
+  }
+  .cta {
+    margin-top: 24px;
+    width: 100%;
+    max-width: 420px;
+  }
+  .cover {
+    position: relative;
+    margin-top: 32px;
+    aspect-ratio: 4 / 3;
+    border-radius: 22px;
+    overflow: visible;
+  }
+  .cover :global(img),
+  .ph {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 22px;
+  }
+  .ph {
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 10px;
+    color: var(--green);
+    font-weight: 700;
+    border: 1px dashed var(--line);
+    background:
+      radial-gradient(circle at 20% 25%, rgb(179 38 30 / 0.12) 0 22px, transparent 23px),
+      radial-gradient(circle at 78% 70%, rgb(29 90 56 / 0.14) 0 30px, transparent 31px),
+      repeating-linear-gradient(135deg, var(--surface) 0 14px, var(--stripe) 14px 28px);
+  }
+  .deco {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    box-shadow: 0 8px 20px rgb(23 39 29 / 0.18);
+  }
+  .d1 {
+    top: -18px;
+    right: 18px;
+    background: var(--yellow);
+    color: #fff;
+  }
+  .d2 {
+    bottom: -18px;
+    left: 18px;
+    background: var(--green);
+    color: #fff;
+  }
+  @media (min-width: 900px) {
+    .container {
+      padding-top: 56px;
+    }
+    .cover {
+      aspect-ratio: 21 / 9;
+    }
+  }
+</style>

@@ -1,0 +1,138 @@
+---
+import Icon from '../Icon.astro';
+import { brl, waLink } from '../../lib/whatsapp';
+
+type Pacote = {
+  nome: string;
+  detalhe: string;
+  itens?: string[];
+  descricao?: string;
+  preco: number | null;
+  destaque?: boolean;
+};
+interface Props {
+  pacotes: Pacote[];
+  /** Builds the WhatsApp message and the tracking label for each card. */
+  mensagem: (p: Pacote) => string;
+  rotulo: (p: Pacote) => string;
+}
+const { pacotes, mensagem, rotulo } = Astro.props;
+---
+
+<div class:list={['packs', `n${pacotes.length}`]}>
+  {pacotes.map((p) => (
+    <article class:list={['pack', { featured: p.destaque }]}>
+      {p.destaque && <span class="badge">Mais procurado</span>}
+      <h3>{p.nome}</h3>
+      <p class="detail">{p.detalhe}</p>
+      <p class="price">
+        {p.preco === null ? (
+          <span class="consult">Sob consulta</span>
+        ) : (
+          <>
+            <small>R$</small>
+            {brl(p.preco)}
+          </>
+        )}
+      </p>
+      {p.descricao && <p class="desc">{p.descricao}</p>}
+      {p.itens && (
+        <ul class="check-list">
+          {p.itens.map((i) => (
+            <li>{i}</li>
+          ))}
+        </ul>
+      )}
+      <a
+        class:list={['btn', 'btn-block', p.destaque ? 'btn-primary' : 'btn-ghost']}
+        href={waLink(mensagem(p))}
+        target="_blank"
+        rel="noopener"
+        data-track="whatsapp"
+        data-label={rotulo(p)}
+      >
+        <Icon name="whatsapp" size={20} />
+        Reservar
+      </a>
+    </article>
+  ))}
+</div>
+
+<style>
+  .packs {
+    display: grid;
+    gap: 14px;
+    margin-top: 28px;
+  }
+  .pack {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 24px 20px 20px;
+    border-radius: var(--radius);
+    background: var(--surface);
+    border: 1px solid var(--line);
+  }
+  .pack.featured {
+    border: 2px solid var(--yellow);
+    box-shadow: 0 14px 34px rgb(179 38 30 / 0.12);
+  }
+  .badge {
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--yellow);
+    color: var(--on-yellow);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  h3 {
+    font-size: 1.3rem;
+    text-transform: uppercase;
+  }
+  .detail {
+    color: var(--green);
+    font-weight: 700;
+    margin-top: -6px;
+  }
+  .price {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .price small {
+    font-size: 1.05rem;
+    color: var(--muted);
+  }
+  .consult {
+    font-size: 1.6rem;
+    letter-spacing: -0.01em;
+  }
+  .desc {
+    color: var(--muted);
+  }
+  .check-list {
+    flex-grow: 1;
+    margin-block: 4px 8px;
+  }
+  .btn-ghost {
+    border-color: var(--text);
+  }
+  @media (min-width: 760px) {
+    .n2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .n3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

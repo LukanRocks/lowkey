@@ -1,9 +1,14 @@
 ---
 import { comoFunciona } from '../data/compartilhado';
+
+interface Props {
+  passos?: { titulo: string; texto: string }[];
+}
+const { passos = comoFunciona } = Astro.props;
 ---
 
 <ol class="steps">
-  {comoFunciona.map((s, i) => (
+  {passos.map((s, i) => (
     <li>
       <span class="n">{i + 1}</span>
       <div>

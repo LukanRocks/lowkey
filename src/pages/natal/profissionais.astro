@@ -1,0 +1,172 @@
+---
+// Christmas landing page for photographers, agencies and brands. Ad-only: not in the menu or sitemap.
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import HowItWorks from '../../components/HowItWorks.astro';
+import Accordion from '../../components/Accordion.astro';
+import Equipment from '../../components/Equipment.astro';
+import MapCard from '../../components/MapCard.astro';
+import StickyCta from '../../components/StickyCta.astro';
+import NatalHero from '../../components/natal/NatalHero.astro';
+import Cenarios from '../../components/natal/Cenarios.astro';
+import Pacotes from '../../components/natal/Pacotes.astro';
+import { natal } from '../../data/natal';
+import { casarao } from '../../data/espacos';
+import { waLink } from '../../lib/whatsapp';
+
+const pro = natal.profissionais;
+const msgGeral =
+  'Olá! Quero reservar os cenários de Natal do Casarão para uma produção. Quais datas estão disponíveis?';
+const planos = pro.planos.map((p) => ({ ...p, detalhe: `${p.horas} horas` }));
+---
+
+<Base
+  title="Cenários de Natal para fotógrafos e agências"
+  description="Três ambientes do Casarão Antigo decorados para o Natal, prontos para campanhas, ensaios e vídeos de fim de ano em Curitiba. Equipamentos inclusos e self check-in."
+  landing
+  theme="natal"
+>
+  <NatalHero
+    eyebrow="Para fotógrafos, agências e marcas"
+    lead="Três ambientes do Casarão Antigo decorados para o Natal. Sem montagem de cenário: chegue, ilumine e produza a sua campanha de fim de ano."
+    chips={['3 cenários prontos', 'Equipamentos inclusos', 'Self check-in', 'Até 35 pessoas']}
+    cta={{ href: waLink(msgGeral), label: 'Reservar data', track: 'Natal profissionais – topo' }}
+  >
+    Cenários de <em>Natal</em> prontos para produzir
+  </NatalHero>
+
+  <section class="section">
+    <div class="container">
+      <span class="eyebrow">Por que aqui</span>
+      <h2>Produza sem cenografia</h2>
+      <div class="perks">
+        {pro.vantagens.map((v, i) => (
+          <div class="card">
+            <Icon name={(['star', 'camera', 'key', 'users'] as const)[i]} size={24} class="perk-icon" />
+            <h3>{v.titulo}</h3>
+            <p class="muted">{v.texto}</p>
+          </div>
+        ))}
+      </div>
+      <p class="uses-title">Ideal para</p>
+      <ul class="chips">
+        {pro.usos.map((u) => (
+          <li class="chip">{u}</li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <span class="eyebrow">Os cenários</span>
+      <h2>
+        Três ambientes de <em>Natal</em>
+      </h2>
+      <p class="lead" style="margin-bottom: 24px">
+        Decoração montada nos ambientes mais fotogênicos do Casarão, com luz natural e detalhes de época.
+      </p>
+      <Cenarios foco="profissional" />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <span class="eyebrow">Períodos</span>
+      <h2>Escolha o período</h2>
+      <p class="lead">Os três cenários e os equipamentos estão inclusos em todos os períodos.</p>
+      <Pacotes
+        pacotes={planos}
+        mensagem={(p) =>
+          `Olá! Quero reservar os cenários de Natal do Casarão – ${p.nome} (${p.detalhe}). Quais datas estão disponíveis?`
+        }
+        rotulo={(p) => `Natal profissionais – ${p.nome}`}
+      />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <span class="eyebrow">Como funciona</span>
+      <h2>Reserve e produza</h2>
+      <HowItWorks passos={pro.passos} />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <span class="eyebrow">Detalhes</span>
+      <h2 style="margin-bottom: 24px">Antes de reservar</h2>
+      <Accordion title="Equipamentos inclusos" hint="Iluminação, suportes e modificadores">
+        <Equipment />
+      </Accordion>
+      <Accordion title="O que você precisa saber" hint="Regras do Casarão">
+        <ul class="check-list">
+          {casarao.saberAntes.map((s) => (
+            <li>{s}</li>
+          ))}
+          <li>{casarao.observacao}</li>
+        </ul>
+      </Accordion>
+      <p class="more">
+        <a href="/casarao">Ver todos os detalhes do Casarão Antigo</a> ·{' '}
+        <a href="/politica-de-cancelamento">Política de cancelamento</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <span class="eyebrow">Onde</span>
+      <h2 style="margin-bottom: 24px">Casarão Antigo, centro de Curitiba</h2>
+      <MapCard />
+    </div>
+  </section>
+
+  <StickyCta
+    slot="cta"
+    href={waLink(msgGeral)}
+    label="Reservar cenários de Natal"
+    trackLabel="Natal profissionais – barra fixa"
+  />
+</Base>
+
+<style>
+  .perks {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 28px;
+  }
+  .perks .card {
+    padding: 18px;
+  }
+  .perks h3 {
+    margin: 12px 0 6px;
+    font-size: 1.05rem;
+  }
+  .perks p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  .perks :global(.perk-icon) {
+    color: var(--yellow);
+  }
+  .uses-title {
+    margin: 28px 0 12px;
+    font-weight: 700;
+  }
+  .more {
+    margin-top: 18px;
+    color: var(--muted);
+  }
+  .more a {
+    color: var(--yellow);
+    font-weight: 700;
+  }
+  @media (min-width: 900px) {
+    .perks {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+</style>

@@ -50,3 +50,14 @@ Nothing loads until the visitor taps **Aceitar** on the cookie banner.
 ## Deploy
 
 Connect the Git repository to Vercel: every push to `main` deploys to production, and every pull request gets a preview link. `vercel.json` holds clean URLs, the old-URL redirect (`/casaro-antigo` → `/casarao`) and long-lived caching for hashed assets.
+
+## Christmas landing pages
+
+Two seasonal pages for ads, in a white, green and red theme. They are not in the menu or the sitemap:
+
+- `/natal/familia`: family photo sessions with a photographer included
+- `/natal/profissionais`: the decorated sets for photographers, agencies and brands
+
+Everything they show lives in `src/data/natal.ts`. Placeholder details are marked `a confirmar`, and prices left as `null` show "Sob consulta". While `rascunho: true`, both pages show a "Rascunho" notice at the top: set it to `false` before running the ads.
+
+Photos go in `src/assets/galeria/natal/sala-da-lareira/`, `escada-dos-vitrais/` and `jardim-de-inverno/`. The first photo of the first set is the cover of both pages.

@@ -28,6 +28,8 @@
   --yellow: #fff200;
   --on-yellow: #0b0b0b;
   --danger: #ff8a7a;
+  --stripe: #121212;
+  --map-filter: invert(1) contrast(0.85) brightness(0.9);
 
   --radius: 14px;
   --radius-sm: 10px;
@@ -280,4 +282,41 @@ ul {
   * {
     transition: none !important;
   }
+}
+
+/* Christmas landing pages (/natal/*): light theme in white, green and red.
+   Shared components read these tokens, so they re-theme without changes. */
+.theme-natal {
+  --bg: #fbf8f2;
+  --surface: #ffffff;
+  --surface-2: #f2ece2;
+  --line: #e4dccf;
+  --text: #17271d;
+  --muted: #56655b;
+  --yellow: #b3261e;
+  --on-yellow: #ffffff;
+  --green: #1d5a38;
+  --gold: #b88a2e;
+  --stripe: #f6f1e8;
+  --map-filter: saturate(0) contrast(0.95);
+  --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  color-scheme: light;
+}
+
+.theme-natal .btn-primary:hover {
+  background: #951d17;
+}
+
+.theme-natal .eyebrow {
+  color: var(--green);
+}
+
+.theme-natal h1 em,
+.theme-natal h2 em {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: -0.01em;
+  color: var(--yellow);
 }

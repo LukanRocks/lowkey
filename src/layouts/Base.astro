@@ -10,9 +10,15 @@ interface Props {
   description: string;
   /** Extra JSON-LD for this page. */
   schema?: Record<string, unknown>;
+  /** Landing pages: logo-only header, no menu or promo pill, short footer. */
+  landing?: boolean;
+  theme?: 'natal';
+  /** Keep the page out of search results (seasonal or ad-only pages). */
+  noindex?: boolean;
 }
 
-const { title, description, schema } = Astro.props;
+const { title, description, schema, landing = false, theme, noindex = false } = Astro.props;
+const themeColor = theme === 'natal' ? '#fbf8f2' : '#0b0b0b';
 const canonical = new URL(Astro.url.pathname.replace(/\.html$/, ''), Astro.site);
 const fullTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
 ---
@@ -25,7 +31,8 @@ const fullTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    <meta name="theme-color" content="#0b0b0b" />
+    <meta name="theme-color" content={themeColor} />
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preload" href="/fonts/archivo-latin-wght.woff2" as="font" type="font/woff2" crossorigin />
 
@@ -39,15 +46,15 @@ const fullTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
 
     {schema && <script type="application/ld+json" set:html={JSON.stringify(schema)} />}
   </head>
-  <body>
+  <body class={theme ? `theme-${theme}` : undefined}>
     <a class="skip" href="#conteudo">
       Pular para o conteúdo
     </a>
-    <Header />
+    <Header minimal={landing} />
     <main id="conteudo">
       <slot />
     </main>
-    <Footer />
+    <Footer minimal={landing} />
     <slot name="cta" />
     <ConsentBanner />
   </body>

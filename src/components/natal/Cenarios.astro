@@ -1,0 +1,68 @@
+---
+import Gallery from '../Gallery.astro';
+import { natal } from '../../data/natal';
+
+interface Props {
+  foco: 'familia' | 'profissional';
+}
+const { foco } = Astro.props;
+---
+
+<Gallery
+  espaco="natal"
+  nome="Casarão de Natal"
+  categorias={natal.cenarios.map((c) => ({ pasta: c.pasta, label: c.nome }))}
+/>
+
+<ol class="sets">
+  {natal.cenarios.map((c, i) => (
+    <li>
+      <span class="n">{i + 1}</span>
+      <div>
+        <h3>{c.nome}</h3>
+        <p class="muted">{c[foco]}</p>
+      </div>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .sets {
+    list-style: none;
+    margin: 28px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+  }
+  li {
+    display: flex;
+    gap: 14px;
+    padding: 16px;
+    border-radius: var(--radius);
+    background: var(--surface);
+    border: 1px solid var(--line);
+  }
+  .n {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--green);
+    color: #fff;
+    font-weight: 800;
+  }
+  h3 {
+    margin: 5px 0 4px;
+  }
+  p {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  @media (min-width: 900px) {
+    .sets {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

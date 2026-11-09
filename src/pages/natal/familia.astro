@@ -1,0 +1,134 @@
+---
+// Christmas landing page for families (photographer included). Ad-only: not in the menu or sitemap.
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import HowItWorks from '../../components/HowItWorks.astro';
+import Accordion from '../../components/Accordion.astro';
+import MapCard from '../../components/MapCard.astro';
+import StickyCta from '../../components/StickyCta.astro';
+import NatalHero from '../../components/natal/NatalHero.astro';
+import Cenarios from '../../components/natal/Cenarios.astro';
+import Pacotes from '../../components/natal/Pacotes.astro';
+import { natal } from '../../data/natal';
+import { waLink } from '../../lib/whatsapp';
+
+const f = natal.familia;
+const msgGeral = 'Olá! Quero reservar um ensaio de Natal em família no Casarão. Quais horários estão disponíveis?';
+---
+
+<Base
+  title="Ensaio de Natal em família no Casarão"
+  description="Fotos de Natal em família em um casarão de época decorado, no centro de Curitiba. Fotógrafo incluso e três cenários prontos. Vagas limitadas em dezembro."
+  landing
+  theme="natal"
+>
+  <NatalHero
+    eyebrow="Ensaio de Natal em família"
+    lead="Um casarão de época decorado para o Natal, com fotógrafo profissional incluso. Vocês só precisam chegar e sorrir."
+    chips={['Fotógrafo incluso', '3 cenários decorados', 'Fotos editadas', 'Centro de Curitiba']}
+    cta={{ href: waLink(msgGeral), label: 'Reservar meu ensaio', track: 'Natal família – topo' }}
+  >
+    Fotos de <em>Natal</em> em família
+  </NatalHero>
+
+  <section class="section">
+    <div class="container">
+      <span class="eyebrow">Os cenários</span>
+      <h2>
+        Três cantinhos de <em>Natal</em>
+      </h2>
+      <p class="lead" style="margin-bottom: 24px">
+        Ambientes do Casarão Antigo decorados para a data, com lareira, madeira e vitrais de época.
+      </p>
+      <Cenarios foco="familia" />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <span class="eyebrow">Pacotes</span>
+      <h2>Escolha o seu ensaio</h2>
+      <p class="lead">Fotógrafo profissional incluso em todos os pacotes.</p>
+      <Pacotes
+        pacotes={f.pacotes}
+        mensagem={(p) =>
+          `Olá! Quero reservar o ${p.nome} de Natal em família (${p.detalhe}). Quais horários estão disponíveis?`
+        }
+        rotulo={(p) => `Natal família – ${p.nome}`}
+      />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <span class="eyebrow">Como funciona</span>
+      <h2>Simples assim</h2>
+      <HowItWorks passos={f.passos} />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container grid-2">
+      <div class="tips">
+        <Icon name="gift" size={28} />
+        <h2>Dicas para o ensaio</h2>
+        <ul class="check-list">
+          {f.dicas.map((d) => (
+            <li>{d}</li>
+          ))}
+        </ul>
+      </div>
+      <div>
+        <span class="eyebrow">Dúvidas</span>
+        <h2 style="margin-bottom: 20px">Perguntas frequentes</h2>
+        {f.faq.map((q) => (
+          <Accordion title={q.p}>
+            <p>{q.r}</p>
+          </Accordion>
+        ))}
+        <p class="policy">
+          Veja a <a href="/politica-de-cancelamento">política de cancelamento</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <span class="eyebrow">Onde</span>
+      <h2 style="margin-bottom: 24px">Casarão Antigo, centro de Curitiba</h2>
+      <MapCard />
+    </div>
+  </section>
+
+  <StickyCta
+    slot="cta"
+    href={waLink(msgGeral)}
+    label="Reservar ensaio de Natal"
+    trackLabel="Natal família – barra fixa"
+  />
+</Base>
+
+<style>
+  .tips {
+    padding: 24px;
+    border-radius: var(--radius);
+    background: var(--green);
+    color: #fff;
+    align-self: start;
+  }
+  .tips h2 {
+    margin: 12px 0 18px;
+  }
+  .tips :global(.check-list li::before) {
+    border-color: #fff;
+  }
+  .policy {
+    margin-top: 16px;
+    color: var(--muted);
+  }
+  .policy a {
+    color: var(--yellow);
+    font-weight: 700;
+  }
+</style>

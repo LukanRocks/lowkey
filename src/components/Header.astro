@@ -4,6 +4,11 @@ import Icon from './Icon.astro';
 import PromoBar from './PromoBar.astro';
 import { nav } from '../data/site';
 
+interface Props {
+  /** Logo only, for ad landing pages. */
+  minimal?: boolean;
+}
+const { minimal = false } = Astro.props;
 const current = Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/';
 ---
 
@@ -16,30 +21,34 @@ const current = Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '') || 
       </span>
     </a>
 
-    <nav class="desktop-nav" aria-label="Principal">
-      {nav.slice(1, 4).map((item) => (
-        <a href={item.href} aria-current={current === item.href ? 'page' : undefined}>
-          {item.label}
-        </a>
-      ))}
-    </nav>
+    {!minimal && (
+      <>
+        <nav class="desktop-nav" aria-label="Principal">
+          {nav.slice(1, 4).map((item) => (
+            <a href={item.href} aria-current={current === item.href ? 'page' : undefined}>
+              {item.label}
+            </a>
+          ))}
+        </nav>
 
-    <details class="menu">
-      <summary aria-label="Abrir menu">
-        <Icon name="menu" size={24} class="open" />
-        <Icon name="x" size={24} class="close" />
-      </summary>
-      <nav class="sheet" aria-label="Menu">
-        {nav.map((item) => (
-          <a href={item.href} aria-current={current === item.href ? 'page' : undefined}>
-            {item.label}
-            <Icon name="arrow" size={18} />
-          </a>
-        ))}
-      </nav>
-    </details>
+        <details class="menu">
+          <summary aria-label="Abrir menu">
+            <Icon name="menu" size={24} class="open" />
+            <Icon name="x" size={24} class="close" />
+          </summary>
+          <nav class="sheet" aria-label="Menu">
+            {nav.map((item) => (
+              <a href={item.href} aria-current={current === item.href ? 'page' : undefined}>
+                {item.label}
+                <Icon name="arrow" size={18} />
+              </a>
+            ))}
+          </nav>
+        </details>
+      </>
+    )}
   </div>
-  {current !== '/grupo-de-whatsapp' && <PromoBar />}
+  {!minimal && current !== '/grupo-de-whatsapp' && <PromoBar />}
 </header>
 
 <style>
@@ -47,7 +56,7 @@ const current = Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '') || 
     position: sticky;
     top: 0;
     z-index: 40;
-    background: rgb(11 11 11 / 0.88);
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--line);
